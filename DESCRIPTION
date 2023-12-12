@@ -2,8 +2,8 @@ Package: pmartR
 Type: Package
 Title: Panomics Marketplace - Quality Control and Statistical Analysis
         for Panomics Data
-Version: 2.4.1
-Date: 2023-11-07
+Version: 2.4.2
+Date: 2023-12-11
 Authors@R: c(
     person("Lisa", "Bramer", email = "lisa.bramer@pnnl.gov", role = c("aut", "cre")), 
     person("Kelly", "Stratton", email = "kelly.stratton@pnnl.gov", role = c("aut")), 
@@ -22,15 +22,15 @@ LinkingTo: Rcpp, RcppArmadillo, BH
 biocViews:
 Imports: Rcpp (>= 0.12.8), data.table, doParallel, dplyr, ggplot2,
         e1071, foreach, methods, mvtnorm, pcaMethods, plotly, purrr,
-        rrcov, stringr, tidyr, RColorBrewer, magrittr, parallelly,
-        patchwork, glmpca,
+        rrcov, stringr, tidyr (>= 1.3.0), RColorBrewer, magrittr,
+        parallelly, patchwork, glmpca,
 Suggests: knitr, limma, rmarkdown, edgeR, DESeq2, scales, S4Vectors,
         survival, testthat, trelliscopejs, pmartRdata, vdiffr
 Additional_repositories: https://pmartR.github.io/drat
 RoxygenNote: 7.2.3
 Encoding: UTF-8
 NeedsCompilation: yes
-Packaged: 2023-12-04 17:45:08 UTC; clab683
+Packaged: 2023-12-11 18:35:01 UTC; clab683
 Author: Lisa Bramer [aut, cre],
   Kelly Stratton [aut],
   Daniel Claborne [aut],
@@ -40,4 +40,4 @@ Author: Lisa Bramer [aut, cre],
   Evan Martin [ctb]
 Maintainer: Lisa Bramer <lisa.bramer@pnnl.gov>
 Repository: CRAN
-Date/Publication: 2023-12-06 10:30:05 UTC
+Date/Publication: 2023-12-12 10:50:02 UTC
