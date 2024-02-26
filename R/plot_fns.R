@@ -261,7 +261,7 @@ plot.dataRes <- function(x, metric = NULL, density = FALSE,
     }
 
     # Want an interactive plot? As you wish.
-    if (interactive) {
+    if (interactive && requirePlotly()) {
       q <- plotly::ggplotly(q)
       p <- plotly::ggplotly(p)
 
@@ -365,7 +365,7 @@ plot.dataRes <- function(x, metric = NULL, density = FALSE,
     }
 
     # Want an interactive plot? As you wish.
-    if (interactive) r <- plotly::ggplotly(r)
+    if (interactive && requirePlotly()) r <- plotly::ggplotly(r)
 
     return(r)
   }
@@ -538,7 +538,7 @@ plot.isobaricnormRes <- function(x, order = FALSE,
   }
 
   # Want an interactive plot? As you wish.
-  if (interactive) p <- plotly::ggplotly(p)
+  if (interactive && requirePlotly()) p <- plotly::ggplotly(p)
 
   return(p)
 }
@@ -822,7 +822,7 @@ plot.nmrnormRes <- function(x, nmrData = NULL, order_by = NULL,
   }
 
   # Farm boy, make me an interactive plot. As you wish.
-  if (interactive) p <- plotly::ggplotly(p)
+  if (interactive && requirePlotly()) p <- plotly::ggplotly(p)
 
   return(p)
 }
@@ -985,7 +985,7 @@ plot.SPANSRes <- function(x, interactive = FALSE,
     )
 
   # Want an interactive plot? As you wish.
-  if (interactive) {
+  if (interactive && requirePlotly()) {
     p <- plotly::plot_ly(
       SPANSRes_obj,
       x = ~normalization_method,
@@ -1453,7 +1453,7 @@ na_bar <- function (na.by.sample, x_lab_bar, y_lab_bar, x_lab_size, y_lab_size,
   if (coordinate_flip) samp <- samp + ggplot2::coord_flip()
 
   # Want an interactive plot? As you wish.
-  if (interactive) samp <- plotly::ggplotly(samp)
+  if (interactive && requirePlotly()) samp <- plotly::ggplotly(samp)
 
   return(samp)
 }
@@ -1521,7 +1521,7 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
     # Calculate the mean intensity for each molecule by group. NaN can appear if
     # an entire row has all NA values.
     mean_by_group <- lapply(indices_list,
-      function(x, temp_edata) rowMeans(temp_edata[, x],
+      function(x, temp_edata) rowMeans(temp_edata[x],
         na.rm = TRUE
       ),
       temp_edata = edata[, -edata_cname_id]
@@ -1595,7 +1595,7 @@ na_scatter <- function (edata, group_df, na.by.molecule, edata_cname,
   }
 
   # Want an interactive plot? As you wish.
-  if (interactive) p <- plotly::ggplotly(p)
+  if (interactive && requirePlotly()) p <- plotly::ggplotly(p)
 
   return(p)
 }
@@ -1768,7 +1768,7 @@ plot.corRes <- function(x, omicsData = NULL, order_by = NULL,
   }
 
   # Create the data frame that will be used to produce the correlation heat map.
-  corRes_obj_df <- data.frame(corRes_obj)
+  corRes_obj_df <- data.frame(corRes_obj, check.names = FALSE)
   corRes_obj_df <- cbind(Var1 = rownames(corRes_obj_df), corRes_obj_df)
   rownames(corRes_obj_df) <- 1:nrow(corRes_obj_df)
   corRes_melt <- corRes_obj_df %>%
@@ -1787,7 +1787,7 @@ plot.corRes <- function(x, omicsData = NULL, order_by = NULL,
         levels = abbreviate(rownames(corRes_obj), minlength = 20)
       )
     ) %>%
-    data.frame
+    data.frame(check.names = FALSE)
 
   # Create all the plot labels. Life is pain!!!
   xlabel <- if (is.null(x_lab)) "" else x_lab
@@ -1892,7 +1892,7 @@ plot.corRes <- function(x, omicsData = NULL, order_by = NULL,
   }
 
   # Farm boy, make me an interactive plot. As you wish.
-  if (interactive) hm <- plotly::ggplotly(hm)
+  if (interactive && requirePlotly()) hm <- plotly::ggplotly(hm)
 
   return(hm)
 }
@@ -2299,7 +2299,7 @@ plot.dimRes <- function (x, omicsData = NULL,
   }
 
   # Evan, make me an interactive plot. As you wish.
-  if (interactive) p <- plotly::ggplotly(p)
+  if (interactive && requirePlotly()) p <- plotly::ggplotly(p)
 
   return(p)
 }
@@ -2576,7 +2576,7 @@ plot.moleculeFilt <- function(x, min_num = NULL, cumulative = TRUE,
   }
 
   # Evan, make me an interactive plot. As you wish.
-  if (interactive) p <- plotly::ggplotly(p)
+  if (interactive && requirePlotly()) p <- plotly::ggplotly(p)
 
   return(p)
 }
@@ -2743,7 +2743,7 @@ plot.totalCountFilt <- function(x, min_count = NULL,
     )
 
   # Evan, make me an interactive plot. As you wish.
-  if (interactive) p <- plotly::ggplotly(p)
+  if (interactive && requirePlotly()) p <- plotly::ggplotly(p)
 
   return(p)
 }
@@ -3025,7 +3025,7 @@ plot.RNAFilt <- function(x, plot_type = "library",
     )
 
   # Evan, make me an interactive plot. As you wish.
-  if (interactive) p <- plotly::ggplotly(p)
+  if (interactive && requirePlotly()) p <- plotly::ggplotly(p)
 
   return(p)
 }
@@ -3413,7 +3413,7 @@ plot.imdanovaFilt <- function(x, min_nonmiss_anova = NULL,
     )
 
   # Evan, make me an interactive plot. As you wish.
-  if (interactive) p <- plotly::ggplotly(p)
+  if (interactive && requirePlotly()) p <- plotly::ggplotly(p)
 
   return(p)
 }
@@ -3769,14 +3769,14 @@ plot.proteomicsFilt <- function(x,
   # Evan, just display the num_peps plot. As you wish.
   if (plot_type == "num_peps") {
     # Evan, make me an interactive num_peps plot. As you wish.
-    if (interactive) p <- plotly::ggplotly(p)
+    if (interactive && requirePlotly()) p <- plotly::ggplotly(p)
 
     return(p)
 
     # Evan, just display the redundancy plot. As you wish.
   } else if (plot_type == "redundancy") {
     # Evan, make me an interactive redundancy plot. As you wish.
-    if (interactive) q <- plotly::ggplotly(q)
+    if (interactive && requirePlotly()) q <- plotly::ggplotly(q)
 
     return(q)
   }
@@ -4369,7 +4369,7 @@ plot.rmdFilt <- function(x, pvalue_threshold = NULL, sampleID = NULL,
   }
 
   # Farm boy, make the plot interactive. As you wish.
-  if (interactive) p <- plotly::ggplotly(p)
+  if (interactive && requirePlotly()) p <- plotly::ggplotly(p)
 
   # Farm boy, return the plot so the entire world can enjoy it. As you wish.
   return(p)
@@ -4813,13 +4813,12 @@ plot.normRes <- function(x, order_by = NULL, color_by = NULL,
   )
 
   # Farm boy, combine the plots and send them into the world. As you wish.
-  if (!interactive) {
-    # Return the regular plots side-by-side.
-
-    p_raw + p_norm
-  } else {
+  if (interactive && requirePlotly()) {
     # Return the interactive plots side-by-side.
     plotly::subplot(p_raw, p_norm, nrows = 1)
+  } else {
+    # Return the regular plots side-by-side.
+    p_raw + p_norm
   }
 }
 
@@ -5889,7 +5888,7 @@ plot_omicsData <- function(omicsData, order_by, color_by, facet_by, facet_cols,
     )
 
   # Farm boy, make me an interactive plot. As you wish.
-  if (interactive) p <- plotly::ggplotly(p)
+  if (interactive && requirePlotly()) p <- plotly::ggplotly(p)
 
   # Farm boy, send my plot into the world to be adored by all. As you wish.
   return(p)
@@ -6168,7 +6167,7 @@ plot.statRes <- function(x,
 
     p <- p + mytheme
 
-    if (interactive)
+    if (interactive && requirePlotly())
       return(plotly::ggplotly(p, tooltip = c("text"))) else
       return(p)
   }
@@ -6278,7 +6277,7 @@ plot.statRes <- function(x,
       ggplot2::ylab(the_y_label) +
       ggplot2::ggtitle(the_title_label) +
       mytheme
-    if (interactive)
+    if (interactive && requirePlotly())
       return(plotly::ggplotly(p, tooltip = c("text"))) else
       return(p)
   } else if ("ma" %in% plot_type) {
@@ -6331,7 +6330,7 @@ plot.statRes <- function(x,
 
     p <- p + mytheme
 
-    if (interactive)
+    if (interactive && requirePlotly())
       return(plotly::ggplotly(p, tooltip = c("text"))) else
       return(p)
   }
@@ -6516,7 +6515,7 @@ make_volcano_plot_df <- function(x) {
     gsub(
       pattern = "_vs_",
       replacement = " vs ",
-      pvals$Comparison
+      volcano$Comparison
     )
 
   # create counts for gtest plot (number present in each group)
@@ -6817,51 +6816,7 @@ gtest_heatmap <-
           )
       )
 
-    if (!interactive) {
-      p <- ggplot2::ggplot(gtest_counts) +
-        ggplot2::theme_minimal() +
-        ggplot2::geom_tile(
-          ggplot2::aes(Count_First_Group,
-            Count_Second_Group,
-            fill = n
-          ),
-          color = "black"
-        )
-
-      if(show_sig) {
-        sig_data <- gtest_counts %>% dplyr::filter(sig)
-        
-        if(nrow(sig_data) > 0) {
-          p <- p + ggplot2::geom_point(
-            data = sig_data,
-            ggplot2::aes(Count_First_Group, Count_Second_Group, shape = "1"),
-            fill = "white"
-          ) +
-          ggplot2::scale_shape_manual(name = "Statistically significant",
-                                      labels = "",
-                                      values = 21)
-        }
-      }
-
-      if (display_count) {
-        p <- p + ggplot2::geom_text(
-          ggplot2::aes(Count_First_Group, Count_Second_Group, label = n),
-          nudge_x = -0.5, nudge_y = 0.5, hjust = -0.1, vjust = 1.5,
-          color = "white", size = text_size
-        )
-      }
-
-      p <- p +
-        ggplot2::facet_wrap(~Comparison) +
-        ggplot2::scale_fill_gradient(
-          name = the_legend_label,
-          low = if (is.null(color_low)) "#132B43" else color_low,
-          high = if (is.null(color_high)) "#56B1F7" else color_high
-        ) +
-        ggplot2::xlab(the_x_label) +
-        ggplot2::ylab(the_y_label) +
-        ggplot2::ggtitle(the_title_label)
-    } else {
+    if (interactive && requirePlotly()) {
       comps <- unique(gtest_counts$Comparison)
       subplot_list <- list()
       limits = range(gtest_counts$n)
@@ -6953,6 +6908,50 @@ gtest_heatmap <-
           xaxis = list(title = the_x_label),
           yaxis = list(title = the_y_label)
         )
+    } else {
+      p <- ggplot2::ggplot(gtest_counts) +
+        ggplot2::theme_minimal() +
+        ggplot2::geom_tile(
+          ggplot2::aes(Count_First_Group,
+            Count_Second_Group,
+            fill = n
+          ),
+          color = "black"
+        )
+
+      if(show_sig) {
+        sig_data <- gtest_counts %>% dplyr::filter(sig)
+        
+        if(nrow(sig_data) > 0) {
+          p <- p + ggplot2::geom_point(
+            data = sig_data,
+            ggplot2::aes(Count_First_Group, Count_Second_Group, shape = "1"),
+            fill = "white"
+          ) +
+          ggplot2::scale_shape_manual(name = "Statistically significant",
+                                      labels = "",
+                                      values = 21)
+        }
+      }
+
+      if (display_count) {
+        p <- p + ggplot2::geom_text(
+          ggplot2::aes(Count_First_Group, Count_Second_Group, label = n),
+          nudge_x = -0.5, nudge_y = 0.5, hjust = -0.1, vjust = 1.5,
+          color = "white", size = text_size
+        )
+      }
+
+      p <- p +
+        ggplot2::facet_wrap(~Comparison) +
+        ggplot2::scale_fill_gradient(
+          name = the_legend_label,
+          low = if (is.null(color_low)) "#132B43" else color_low,
+          high = if (is.null(color_high)) "#56B1F7" else color_high
+        ) +
+        ggplot2::xlab(the_x_label) +
+        ggplot2::ylab(the_y_label) +
+        ggplot2::ggtitle(the_title_label)
     }
 
     return(p)
@@ -7037,7 +7036,7 @@ statres_volcano_plot <-
 
     # interactive plots need manual text applied to prepare for ggplotly
     # conversion
-    if (interactive) {
+    if (interactive && requirePlotly()) {
       p <-
         ggplot2::ggplot(temp_data_anova, ggplot2::aes(
           Fold_change,
@@ -7090,3 +7089,22 @@ statres_volcano_plot <-
 
     return(p)
   }
+
+#' Require Plotly
+#'
+#' Loads plotly if installed, else prints a message telling the user to install
+#' plotly.
+#' 
+#' @return whether plotly is installed
+#' 
+#' @keywords internal
+#' 
+#' @noRd
+requirePlotly <- function() {
+  if (requireNamespace("plotly", quietly = TRUE)) {
+    return(TRUE)
+  }
+  
+  warning("Package 'plotly' is not installed. Please install it to use interactive plots.")
+  return(FALSE)
+}
