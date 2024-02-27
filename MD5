@@ -1,4 +1,4 @@
-4ba635d238ca95dae9354ebbc253bde2 *DESCRIPTION
+da5470a2d8a8287d637d6f0e8cd6fe1d *DESCRIPTION
 73ffd832c3117096bd79e387a04e23f2 *LICENSE
 7fbc9adab02e9bce23e1bb687227849a *NAMESPACE
 73ecb606829a857464ab9f88a9d649fa *R/MSnSet2pepData.R
@@ -395,5 +395,5 @@ b31f388b2bc20816e63bb2b9c696a6a4 *tests/testthat/test_result_missingval.R
 81852751ca7b3e108105202c0f876d9b *tests/testthat/test_summary_filter.R
 f9aefdb4b3b4b210e35603a6db7ce234 *tests/testthat/test_summary_omicsData.R
 09789dcbf7fc5830e687ab043335a606 *tests/testthat/test_trelliPlots.R
-13ed7bdfdd6e0988d3ab2e9ca810d568 *tests/testthat/test_trelliPlots_seqData.R
+75d8f9b442038ac0d5f3232a735ad094 *tests/testthat/test_trelliPlots_seqData.R
 0824eb81d679ab38aad01e670e709d3e *tests/testthat/test_trelli_pvalue_filter.R
