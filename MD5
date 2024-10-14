@@ -1,9 +1,9 @@
-f4a939910b0cf0220d1c445e95b16b97 *DESCRIPTION
+e3886490cbc4c754ba36a877f7faaad6 *DESCRIPTION
 73ffd832c3117096bd79e387a04e23f2 *LICENSE
 442c7600ba1d9cb7b55805a9c356d9b4 *NAMESPACE
 73ecb606829a857464ab9f88a9d649fa *R/MSnSet2pepData.R
 5bfefd42388f1f0cc1c64cf07e5bcac1 *R/RcppExports.R
-1938fd7c045b4148890e72a5387d7774 *R/applyFilt.R
+ba31447f6a6b55fdccba6dca9c49eaeb *R/applyFilt.R
 46b9b59d415ce412a5d7063da7d15195 *R/as.multiData.R
 8742415581b65c299c0bc08f188e7daa *R/as.omicsData.R
 4bcaa92edfd77dfb29c6a95c1d645ac9 *R/as.trelliData.R
@@ -17,10 +17,10 @@ ffb1af52b44b19a337bac5bb6c75b677 *R/dim_reduction.R
 2f39c01df67bca0f0395717969a52bda *R/edata_replace.R
 9507960860b5e6f3646da3151db95a1b *R/edata_summary.R
 d592d9fc7d1365d429418b3e89cda94a *R/edata_transform.R
-75e66ac224590f0a85de1676f075039d *R/filter_objects.R
+bb3a6a41d4464d60a729f814e42963bd *R/filter_objects.R
 4f7df80e09a1b387a254693d837e88c4 *R/filter_summary.R
 1200d1336e9c7cc5691083ae2aa23c11 *R/get_comparisons.R
-4e57f6629d877470b3196d489dcdcaca *R/group_designation.R
+e600395629c7d8711b5ae7dc601d42d9 *R/group_designation.R
 3ad1c5054c837c21caa5d35708020c85 *R/helper_fn.R
 f35c268fa5bdcb55d3a9a4eb8043011a *R/imd_anova.R
 80f79c2fb03d5d33e2c4946259565c92 *R/missingval_result.R
@@ -39,11 +39,11 @@ d69d1ea9d56f1ab73a2994327446e299 *R/pmartR.R
 06c7b0506a83af8130c7fe5a9509ad97 *R/pre_imdanova_melt.R
 9b47587add8e79e53b3fbcdb7e9297d7 *R/print_data_objects.R
 42971c430fd57ecfd4dc7a2c1c510282 *R/print_filter_objects.R
-3e0a22cedc9704eae578b2fa3f50647c *R/protein_quant.R
+6b1ed99f49ba79da8820820e75af4880 *R/protein_quant.R
 4e293a6eb7985d082490270a800ca950 *R/report_dataRes.R
 5c601ba58dd32a082666cf0284f5333d *R/results_summary.R
 5244bfb219341314f0dcc645451c8d96 *R/rmd_conversion.R
-2845bc1185a88d93fe44cb1fd8a75553 *R/seqData_wrappers.R
+d8ec0ffb0948d0530f508d03e76d55f7 *R/seqData_wrappers.R
 db4eca9036c016051f0eb51429c358fa *R/spans.R
 244132b5d42c0ba923e5ec3e57104f76 *R/statRes_class.R
 bc2225a8a4154692f8bec15fe560c811 *R/subset_funcs.R
@@ -55,7 +55,7 @@ bc2225a8a4154692f8bec15fe560c811 *R/subset_funcs.R
 d457c3fb4191463b77f8a4860a427a3a *R/survival.R
 cb9337404255a4e73797cbafd357ba32 *R/trelliPlots.R
 a7bb9fbd882934f530721ddae830df0e *R/trelliPlots_seqData.R
-4890242cbcb1f5e165f5998cefaf853b *README.md
+ce3d99f402d71764245c38d9e3587295 *README.md
 de054cf6be06172e699aac4a22054653 *inst/CITATION
 847e5bb767c8d94005b2b733c472b628 *inst/testdata/imd_anova_standard_fns.R
 571689e1d8be3ca37852345a0933d9d4 *inst/testdata/lipidData.R
@@ -297,8 +297,8 @@ dba10f0e43699039eb340466a6053a92 *man/zscore_transform.Rd
 a96e72e086a92688ca258a791e0d1cd2 *src/RcppExports.cpp
 69f18444c62d720c37b1e6fa8d282735 *src/calculate_cv.cpp
 7be7f037258489671dccbdf208af8aff *src/count_missing_cpp.cpp
-f0d4983eb681dac3e011947bdb11274d *src/imd_anova.cpp
-cdc31eebfb24bcf6a6596eef8f693dd9 *src/kw_rcpp.cpp
+0bc07a2b1a2490408921a5bc13b0f6e8 *src/imd_anova.cpp
+2febe1dd3d7595beda0c2a8e24ea20fe *src/kw_rcpp.cpp
 535fa34f933b211a039621536d2c1648 *src/nonmissing_per_grp.cpp
 ed86e44151adae096f0eb2e3cfc8a09c *tests/testthat.R
 8c48d83210ee6be9dcf694fffb6f9cb1 *tests/testthat/_snaps/plots/plot-corres.svg
@@ -390,7 +390,7 @@ c5a2e1acbf78d5a5e5792061488fa6b1 *tests/testthat/test_normalize_spans.R
 45542bf05d06434d021829388cdc878c *tests/testthat/test_plots.R
 90b57c275c2adf736de070b85e1d1fbf *tests/testthat/test_pooled_cv_rcpp.R
 8d486c8789ebc9238cb170cb3c8a63f7 *tests/testthat/test_quant_bp.R
-ee49494e01a17ecfffa86108cf31d520 *tests/testthat/test_quant_protein.R
+426ab226e0ae82b280d3a02708d9ae73 *tests/testthat/test_quant_protein.R
 bc471ca864424693b2c10662b332093a *tests/testthat/test_replace_zeros.R
 3f226a842ad50b4ad71dd3c22e4e1d54 *tests/testthat/test_result_cor.R
 b31f388b2bc20816e63bb2b9c696a6a4 *tests/testthat/test_result_missingval.R
