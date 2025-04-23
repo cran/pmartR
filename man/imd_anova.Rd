@@ -15,6 +15,7 @@ imd_anova(
   pval_adjust_g_fdr = "none",
   pval_thresh = 0.05,
   equal_var = TRUE,
+  model_selection = "auto",
   parallel = TRUE
 )
 }
@@ -55,6 +56,13 @@ to no p-value adjustment.}
 biomolecules are considered differentially expressed. Defaults to 0.05}
 
 \item{equal_var}{logical; should the variance across groups be assumed equal?}
+
+\item{model_selection}{Character, one of 'full', 'reduced', or 'auto'
+indicating the model to be used in the ANOVA analysis. The default 'auto' performs an F-test
+to determine if the full model is necessary. If the F-test is significant,
+the full model is used, otherwise the reduced model is used.  'full' uses all main
+effects, covariates, and interactions between main effects. 'reduced' does 
+not consider interactions between main effects (only covariates and marginal main effects).}
 
 \item{parallel}{logical value indicating whether or not to use a
 "doParallel" loop when running the G-Test with covariates. Defaults to
@@ -104,7 +112,11 @@ mymetab <- group_designation(omicsData = mymetab, main_effects = c("Phenotype", 
 imd_anova_res <- imd_anova(omicsData = mymetab, test_method = 'comb')
 
 # Same but with custom comparisons
-comp_df <- data.frame(Control = c("Phenotype1", "A"), Test = c("Phenotype2", "B"))
+comp_df <- data.frame(
+  check.names = FALSE, 
+  Control = c("Phenotype1", "A"), 
+  Test = c("Phenotype2", "B")
+)
 custom_comps_res <- imd_anova(omicsData = mymetab, comparisons = comp_df, test_method = "combined")
 \dontshow{\}) # examplesIf}
 }

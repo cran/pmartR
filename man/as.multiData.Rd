@@ -70,7 +70,7 @@ mypro <- pro_object
 mymultidata <- as.multiData(mymetab, mypro, auto_fmeta = TRUE, sample_intersect = TRUE)
 
 # Manually supply an f_meta
-f_meta <- data.frame(
+f_meta <- data.frame(check.names = FALSE, 
   "Proteins" = mypro$f_data$SampleID[match(mymetab$f_data$SampleID, mypro$f_data$SampleID)],
   "Metabolites" = mymetab$f_data$SampleID,
   "Condition" = mymetab$f_data$Phenotype[match(mymetab$f_data$SampleID, mypro$f_data$SampleID)]
@@ -82,6 +82,6 @@ mymultidata <- as.multiData(mymetab, mypro, f_meta = f_meta, sample_intersect = 
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-\code{\link{combine_lipidData}} if you want to combine lipidData
+\code{\link{combine_omicsData}} if you want to combine lipidData
  objects before providing them to as.multiData.
 }

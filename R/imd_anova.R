@@ -31,6 +31,12 @@
 #' @param pval_thresh numeric p-value threshold, below or equal to which
 #'   biomolecules are considered differentially expressed. Defaults to 0.05
 #' @param equal_var logical; should the variance across groups be assumed equal?
+#' @param model_selection Character, one of 'full', 'reduced', or 'auto'
+#'  indicating the model to be used in the ANOVA analysis. The default 'auto' performs an F-test
+#'  to determine if the full model is necessary. If the F-test is significant,
+#'  the full model is used, otherwise the reduced model is used.  'full' uses all main
+#'  effects, covariates, and interactions between main effects. 'reduced' does 
+#'  not consider interactions between main effects (only covariates and marginal main effects).
 #' @param parallel logical value indicating whether or not to use a
 #'   "doParallel" loop when running the G-Test with covariates. Defaults to
 #'   TRUE.
@@ -81,7 +87,11 @@
 #' imd_anova_res <- imd_anova(omicsData = mymetab, test_method = 'comb')
 #'
 #' # Same but with custom comparisons
-#' comp_df <- data.frame(Control = c("Phenotype1", "A"), Test = c("Phenotype2", "B"))
+#' comp_df <- data.frame(
+#'   check.names = FALSE, 
+#'   Control = c("Phenotype1", "A"), 
+#'   Test = c("Phenotype2", "B")
+#' )
 #' custom_comps_res <- imd_anova(omicsData = mymetab, comparisons = comp_df, test_method = "combined")
 #'
 #' @export
@@ -95,6 +105,7 @@ imd_anova <- function(omicsData,
                       pval_adjust_g_fdr = 'none',
                       pval_thresh = 0.05,
                       equal_var = TRUE,
+                      model_selection = "auto",
                       parallel = TRUE) {
   # Preliminaries --------------------------------------------------------------
 
@@ -252,6 +263,10 @@ imd_anova <- function(omicsData,
     stop("pval_thresh must be between 0 and 1.")
   }
 
+  if (!isTRUE(model_selection %in% c("full", "reduced", "auto"))) {
+    stop("model_selection must be one of 'full', 'reduced', or 'auto'.")
+  }
+  
   # Statisticalness!!! ---------------------------------------------------------
 
   # Determine the non-missing per group counts for ALL biomolecules. Depending
@@ -275,7 +290,7 @@ imd_anova <- function(omicsData,
       # This list will only contain the Results data frame with the biomolecule
       # ID and counts across all samples.
       imd_results_full <- list(
-        Results = data.frame(
+        Results = data.frame(check.names = FALSE, 
           ids = omicsData$e_data[, edata_idx],
           Count_paired_diff = rowSums(!is.na(omicsData$e_data[, -edata_idx]))
         )
@@ -338,6 +353,7 @@ imd_anova <- function(omicsData,
       covariates = NULL,
       paired = paired,
       equal_var = equal_var,
+      model_selection = model_selection,
       parallel = parallel
     )
   } else {
@@ -350,6 +366,7 @@ imd_anova <- function(omicsData,
       covariates = covariates,
       paired = paired,
       equal_var = equal_var,
+      model_selection = model_selection,
       parallel = parallel
     )
     anova_fold_flags <- anova_results_full$Flags
@@ -480,7 +497,7 @@ imd_anova <- function(omicsData,
     # Create a variable for the combined flags. This will be added as an
     # attribute of the statRes object and used in the bpquant function to create
     # the signatures variable.
-    the_flag <- data.frame(
+    the_flag <- data.frame(check.names = FALSE, 
       Full_results[[get_edata_cname(omicsData)]],
       imd_flags
     )
@@ -618,6 +635,12 @@ imd_anova <- function(omicsData,
 #'   peptides are considered differentially expressed. Defaults to 0.05
 #' @param covariates A character vector with no more than two variable names
 #'   that will be used as covariates in the IMD-ANOVA analysis.
+#' @param model_selection Character, one of 'full', 'reduced', or 'auto'
+#'  indicating the model to be used in the ANOVA analysis. The default 'full' uses all main
+#'  effects, covariates, and interactions between main effects. 'reduced' does 
+#'  not consider interactions between main effects. 'auto' performs an F-test
+#'  to determine if the full model is necessary. If the F-test is significant,
+#'  the full model is used, otherwise the reduced model is used.
 #' @param paired logical; should the data be paired or not? if TRUE then the
 #'   `f_data` element of `omicsData` is checked for a "Pair" column, an error is
 #'   returned if none is found
@@ -645,8 +668,8 @@ imd_anova <- function(omicsData,
 #'   Journal of proteome research 9.11 (2010): 5748-5756.
 #'
 anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
-                       pval_adjust_fdr, pval_thresh, covariates, paired, equal_var,
-                       parallel) {
+                       pval_adjust_fdr, pval_thresh, covariates, model_selection, 
+                       paired, equal_var, parallel) {
   # Catch if number of groups is too small
   k <- length(unique(groupData$Group))
   if (k < 2 && !"no_main_effect" %in% attr(groupData, "main_effects")) {
@@ -755,7 +778,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     ) %>%
       dplyr::group_by(!!dplyr::sym(da_pair_name)) %>%
       dplyr::slice(1) %>%
-      data.frame()
+      data.frame(check.names = FALSE)
 
     # Grab the column containing the pair ID. This will be used to create the
     # new sample name for the paired differences.
@@ -820,7 +843,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
         # it is not needed. We don't need it messing up our hard work in
         # unpredictable ways in other functions.
         dplyr::select(-2) %>%
-        data.frame()
+        data.frame(check.names = FALSE)
 
       # Update the sample names in cov_data according to the newly created
       # paired sample names.
@@ -938,7 +961,8 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
       Xfull=Xfull, Xred=Xred,
       pred_grid_full=pred_grid_full,
       pred_grid_red=pred_grid_red,
-      continuous_covar_inds = continuous_covar_inds
+      continuous_covar_inds = continuous_covar_inds,
+      model_selection = model_selection
     )
 
     which_xmatrix = raw_results$which_X
@@ -947,7 +971,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
   }
   
   #The C++ function returns a list so we need to make it into a data.frame
-  results <- data.frame(raw_results$Sigma2, raw_results$lsmeans, raw_results$Fstats, raw_results$pvalue, raw_results$dof, which_xmatrix)
+  results <- data.frame(check.names = FALSE, raw_results$Sigma2, raw_results$lsmeans, raw_results$Fstats, raw_results$pvalue, raw_results$dof, which_xmatrix)
   
   #Rename the columns to match group names
   colnames(results) <- c("Variance",group_names,"F_Statistic","p_value", "degrees_of_freedom", "which_xmatrix")
@@ -997,7 +1021,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     Cmat_res <- create_c_matrix(groupData, comparisons)
     Cmat <- Cmat_res$cmat
     fold_change <- fold_change_ratio(raw_results$lsmeans, Cmat)
-    fold_change <- data.frame(fold_change)
+    fold_change <- data.frame(check.names = FALSE, fold_change)
     colnames(fold_change) <- colnames(group_comp$diff_mat)
   }
 
@@ -1027,7 +1051,7 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
   } else {
     sig_indicators[which(sig_indicators >= pval_thresh)] <- 0
   }
-  sig_indicators <- data.frame(sig_indicators)
+  sig_indicators <- data.frame(check.names = FALSE, sig_indicators)
   colnames(sig_indicators) <- colnames(fold_change)
 
   # Return stuffs --------------------------------------------------------------
@@ -1050,7 +1074,15 @@ anova_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
 }
 
 #Wrapper function for the two factor ANOVA function
-run_twofactor_cpp <- function(data,gpData, Xfull, Xred, pred_grid_full, pred_grid_red, continuous_covar_inds){
+run_twofactor_cpp <- function(data,gpData, Xfull, Xred, pred_grid_full, pred_grid_red, continuous_covar_inds, model_selection){
+  
+  model_selection = switch(
+    model_selection,
+    "reduced" = 0,
+    "full" = 1,
+    "auto" = 2
+  )
+  
   #Run the two factor ANOVA model
   res <- two_factor_anova_cpp(
     data,
@@ -1060,7 +1092,8 @@ run_twofactor_cpp <- function(data,gpData, Xfull, Xred, pred_grid_full, pred_gri
     pred_grid_full,
     pred_grid_red,
     continuous_covar_inds,
-    attr(pred_grid_red, "groups")
+    attr(pred_grid_red, "groups"),
+    model_selection
   )
 
   res$Xfull <- Xfull
@@ -1109,11 +1142,11 @@ group_comparison_anova <- function(data,groupData,comparisons, Xfull, Xred, anov
   
   group_comp <- group_comparison_anova_cpp(means, data, sizes, which_xmatrix, Xfull, Xred, Cnew_full, Cnew_red, Cmat)
   
-  group_comp$diff_mat <- data.frame(group_comp$diff_mat)
+  group_comp$diff_mat <- data.frame(check.names = FALSE, group_comp$diff_mat)
   colnames(group_comp$diff_mat) <- Cmat_res$names
   colnames(group_comp$diff_ses) <- Cmat_res$names
   colnames(group_comp$t_tests) <- paste(Cmat_res$names, "Test-Stat")
-  group_comp$p_values <- data.frame(group_comp$p_values)
+  group_comp$p_values <- data.frame(check.names = FALSE, group_comp$p_values)
   colnames(group_comp$p_values) <- paste(Cmat_res$names, "p-value")
   return(group_comp)
 }
@@ -1160,9 +1193,9 @@ paired_test <- function(data, bio_ids, cutoff, parallel) {
   return(
     list(
       Results = results,
-      Fold_changes = data.frame(paired_diff = results$Mean_paired_diff),
-      Fold_change_pvalues = data.frame(paired_diff = t_pval),
-      Flags = data.frame(paired_diff = banner)
+      Fold_changes = data.frame(check.names = FALSE, paired_diff = results$Mean_paired_diff),
+      Fold_change_pvalues = data.frame(check.names = FALSE, paired_diff = t_pval),
+      Flags = data.frame(check.names = FALSE, paired_diff = banner)
     )
   )
 }
@@ -1272,7 +1305,7 @@ imd_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
 
   # Number of samples associated with each group
   nK <- as.numeric(table(gp))
-  label_map <- data.frame(Num_label = 1:k, Group = unique(groupData$Group), nK = nK)
+  label_map <- data.frame(check.names = FALSE, Num_label = 1:k, Group = unique(groupData$Group), nK = nK)
 
   # Global IMD test - any pattern in missing across all groups? ----------------
 
@@ -1305,7 +1338,7 @@ imd_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
   Global_Gk <- 2 * rowSums(Gks)
 
   # Put the statistic, degrees of freedom and p-value into a data frame
-  Global_results <- data.frame(Statistic = Global_Gk, p_value = pchisq(Global_Gk, df = (k - 1), lower.tail = FALSE))
+  Global_results <- data.frame(check.names = FALSE, Statistic = Global_Gk, p_value = pchisq(Global_Gk, df = (k - 1), lower.tail = FALSE))
 
   # Pull off edata_cname and add to results df
   edatacname <- attr(omicsData, "cnames")$edata_cname
@@ -1329,8 +1362,8 @@ imd_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
   if (k == 2) {
     # Determine if covariates/paired data should be accounted for.
     if (is.null(covariates) || paired) {
-      pairwise_stats <- data.frame(Global_Gk)
-      pairwise_pvals <- data.frame(Global_results$p_value)
+      pairwise_stats <- data.frame(check.names = FALSE, Global_Gk)
+      pairwise_pvals <- data.frame(check.names = FALSE, Global_results$p_value)
     } else {
       interim <- imd_cov(
         data = omicsData$e_data[, -edataIdx],
@@ -1361,8 +1394,8 @@ imd_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     # Determine if covariates/paired data should be accounted for.
     if (is.null(covariates) && !paired) {
       pairwise_gk <- group_comparison_imd(groupData, comparisons, observed, absent)
-      pairwise_stats <- data.frame(pairwise_gk$GStats)
-      pairwise_pvals <- data.frame(pairwise_gk$pvalues)
+      pairwise_stats <- data.frame(check.names = FALSE, pairwise_gk$GStats)
+      pairwise_pvals <- data.frame(check.names = FALSE, pairwise_gk$pvalues)
       colnames(pairwise_pvals) <- colnames(pairwise_gk$pvalues)
       ratio_diff <- pairwise_gk$signs
     } else {
@@ -1418,8 +1451,8 @@ imd_test <- function(omicsData, groupData, comparisons, pval_adjust_multcomp,
     sig_indicators[which(sig_indicators >= pval_thresh)] <- 0
   }
 
-  sig_indicators <- data.frame(sig_indicators)
-  # sig_indicators <- data.frame(adjusted_pvals[,1],sig_indicators)
+  sig_indicators <- data.frame(check.names = FALSE, sig_indicators)
+  # sig_indicators <- data.frame(check.names = FALSE, adjusted_pvals[,1],sig_indicators)
   # colnames(sig_indicators)[1] <- colnames(adjusted_pvals)[1]
 
   return(list(
@@ -1640,7 +1673,7 @@ imd_cov <- function(data, groupData, fdata, cmat,
       }
 
       # Snag the test statistic and p-value from the anova(glm()) output.
-      dragon <- data.frame(
+      dragon <- data.frame(check.names = FALSE, 
         daStats = ninja$Deviance[[gem]],
         daPvals = ninja$`Pr(>Chi)`[[gem]]
       )
@@ -1689,7 +1722,7 @@ cbindList <- function(aList) {
   }
 
   # Convert to a data frame.
-  aDF <- data.frame(aMatrix)
+  aDF <- data.frame(check.names = FALSE, aMatrix)
 
   return(aDF)
 }
@@ -1884,7 +1917,7 @@ p_adjustment_anova <- function(p_values, diff_mean, t_stats,
 
   # Return the adjusted p-values
 
-  return(pvalues = data.frame(adjusted_pvals))
+  return(pvalues = data.frame(check.names = FALSE, adjusted_pvals))
 }
 
 # I haven't found a function that quickly gets the rank of the original p-values
@@ -2057,7 +2090,7 @@ get_lsmeans <- function(data, xmatrix, pred_grid, Betas, continuous_covar_inds=N
     dplyr::summarise(dplyr::across(dplyr::where(is.numeric), mean)) %>%
     dplyr::select(-dplyr::one_of("Group")) %>%
     t() %>%
-    as.data.frame() %>%
+    as.data.frame(check.names = FALSE) %>%
     `colnames<-`(paste0("Mean_", attr(pred_grid, "ordered_group_names")))
 
   return(lsmeans)
@@ -2169,7 +2202,7 @@ take_diff <- function(omicsData) {
     dplyr::pull(pair_idx)
 
   # Check if the data from the pair ID column is numeric. If it is the word
-  # "Pair" will be added before each number. That way data.frame() won't
+  # "Pair" will be added before each number. That way data.frame(check.names = FALSE) won't
   # complain because the column names of the difference data will not be
   # numbers. Everyone wins!!!
   if (is.numeric(moniker)) {
