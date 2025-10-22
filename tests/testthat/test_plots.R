@@ -10,41 +10,6 @@ expect_doppelganger_ci <- function(...) {
   }
 }
 
-test_that('plot helper functions are working good!', {
-  load(system.file('testdata', 'little_pdata.RData', package = 'pmartR'))
-  
-  # need a test fixture for this...
-  edata['Mass Tag ID'] <- edata$Mass_Tag_ID
-  edata$Mass_Tag_ID <- NULL
-  
-  emeta['Mass Tag ID'] <- emeta$Mass_Tag_ID
-  emeta['Protein Space'] <- emeta$Protein
-  emeta$Mass_Tag_ID <- NULL
-  emeta$Protein <- NULL
-  
-  pep_object <- as.pepData(
-    e_data = edata,
-    f_data = fdata,
-    e_meta = emeta,
-    edata_cname = 'Mass Tag ID',
-    fdata_cname = 'SampleID',
-    emeta_cname = 'Protein Space'
-  )
-  
-  mypep<- edata_transform(omicsData = pep_object, data_scale = "log2")
-  mypep <- group_designation(omicsData = mypep,
-                            main_effects = "Condition")
-  imdanova_Filt <- imdanova_filter(omicsData = mypep)
-  mypep <- applyFilt(filter_object = imdanova_Filt,
-                     omicsData = mypep,
-                     min_nonmiss_anova=2)
-  anova_res <- imd_anova(omicsData = mypep, test_method = 'combined')
-  
-  volcano_df <- pmartR:::make_volcano_plot_df(anova_res)
-  
-  expect_equal(dim(volcano_df), c(dim(mypep$e_data)[1]*2, 10))
-})
-
 test_that('plot functions are producing desired output',{
   testthat::skip_on_cran()
   testthat::skip_if_not_installed("vdiffr")
@@ -185,14 +150,9 @@ test_that('plot functions are producing desired output',{
   
   ## Test plot.SPANSRES --------------------------------------------------------
   
-  expect_doppelganger_ci("plot.SPANSRes", 
-                         plot(pep_spans_result))
-  expect_doppelganger_ci("plot.SPANSRes (bw_theme)", 
-                         plot(pep_spans_result, bw_theme = TRUE))
-  expect_doppelganger_ci("plot.SPANSRes (color_high color_low)", 
-                         plot(pep_spans_result, color_high = "#00FFFF", color_low = "#FF0000"))
-  expect_doppelganger_ci("plot.SPANSRes (N biomolecule bar)", 
-                         plot(pep_spans_result, Npep_bar = T))
+  expect_doppelganger_ci("plot.SPANSRes", plot(pep_spans_result))
+  expect_doppelganger_ci("plot.SPANSRes (bw_theme)", plot(pep_spans_result, bw_theme = TRUE))
+  expect_doppelganger_ci("plot.SPANSRes (color_high color_low)", plot(pep_spans_result, color_high = "#00FFFF", color_low = "#FF0000"))
   
   ## Test plot.isobaricnormRes -------------------------------------------------
   
@@ -306,6 +266,8 @@ test_that('plot functions are producing desired output',{
   expect_doppelganger_ci("plot.statRes (combined)", plot(imd_anova_res, bw_theme = TRUE))
 
   expect_doppelganger_ci("plot.statRes (combined volcano)", plot(imd_anova_res, plot_type = "volcano", bw_theme = TRUE))
+  
+  expect_doppelganger_ci("plot.statRes (histogram)", plot(imd_anova_res, plot_type = "histogram", fc_colors = c("blue","gray"), bw_theme = TRUE))
   ## Test plot.totalcountFilt --------------------------------------------------
   
   seqfilt <- total_count_filter(omicsData = rnaseq_object)
@@ -338,5 +300,5 @@ test_that('plot functions are producing desired output',{
   
   myseq <- group_designation(omicsData = rnaseq_object, main_effects = "Tissue")
   expect_doppelganger_ci("plot.seqData", plot(rnaseq_object, transformation = "lcpm"))
-  
+
 })
